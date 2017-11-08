@@ -4,6 +4,7 @@
 import os
 import configparser
 from bs4 import BeautifulSoup
+from datetime import datetime
 import csv
 import re
 
@@ -39,7 +40,7 @@ for ml in MAILING_LISTS:
                 mail_file = entry + '.html'
                 email_file = monthly_dir + '/' + mail_file
 
-                with open(email_file, 'r', encoding='latin-1') as f:
+                with open(email_file, 'r', encoding='utf-8') as f:
                     webpage = f.read()
                     soup = BeautifulSoup(webpage, 'html.parser')
 
@@ -54,12 +55,20 @@ for ml in MAILING_LISTS:
                                 start = len(fieldname) + 2
                                 current_mail[fieldname] = i.text[start:]
 
+                    # Format date
+                    date = datetime.strptime(
+                        current_mail["Date"],
+                        "%a, %d %b %Y %H:%M:%S %z")
+                    current_mail["Date"] = date.strftime("%Y-%m-%d %H:%M:%S")
+
                     for i in soup.find_all('p'):
                         if 'Attachment:' in i.text:
                             current_file = current_mail.copy()
                             current_file['Attachment'] = i.a.text
 
-                    all_files.append(current_file)
+                            if current_file not in all_files:
+                                all_files.append(current_file)
+
 
 with open(OUTPUT_FILE, 'w') as csvfile:
     fieldnames = [
