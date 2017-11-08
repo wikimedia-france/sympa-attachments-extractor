@@ -39,7 +39,7 @@ for ml in MAILING_LISTS:
                 mail_file = entry + '.html'
                 email_file = monthly_dir + '/' + mail_file
 
-                with open(email_file, 'r') as f:
+                with open(email_file, 'r', encoding='latin-1') as f:
                     webpage = f.read()
                     soup = BeautifulSoup(webpage, 'html.parser')
 
