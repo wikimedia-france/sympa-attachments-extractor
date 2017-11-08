@@ -1,0 +1,6 @@
+[sympa]
+base_dir= /path/to/sympa/lists
+base_url= https://lists.exampledomain.com/arc/test/
+server_name=lists.exampledomain.com
+output_file=output.csv
+mailing_lists=sample1,sample2
