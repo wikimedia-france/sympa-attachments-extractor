@@ -5,11 +5,11 @@ import os
 import configparser
 from bs4 import BeautifulSoup
 import csv
-
+import re
 
 # Read the config file
 config = configparser.ConfigParser()
-config.read(os.path.dirname(__file__) + '/config.ini')
+config.read('config.ini')
 
 BASE_DIR = config.get('sympa', 'base_dir')
 SERVER_NAME = config.get('sympa', 'server_name')
@@ -17,6 +17,8 @@ BASE_URL = config.get('sympa', 'base_url')
 OUTPUT_FILE = config.get('sympa', 'output_file')
 MAILING_LISTS = config.get('sympa', 'mailing_lists').split(',')
 all_files = []
+
+mail_pattern = re.compile("^msg\d{5}$")
 
 for ml in MAILING_LISTS:
     print("Parsing emails from {}@{} mailing list".format(ml, SERVER_NAME))
@@ -26,15 +28,15 @@ for ml in MAILING_LISTS:
 
     for m in months:
         monthly_dir = ml_dir + '/' + m
-        for entry in os.scandir(monthly_dir):
+        for entry in os.listdir(monthly_dir):
 
             """
             If there a mail has an attachment, there will will be both
             a msgXXXXX dir along the msgXXXXX.html file, so for each
             msgXXXXX dir, we parse the matching html file.
             """
-            if entry.is_dir() and entry.name[0:3] == 'msg':
-                mail_file = entry.name + '.html'
+            if mail_pattern.match(entry):
+                mail_file = entry + '.html'
                 email_file = monthly_dir + '/' + mail_file
 
                 with open(email_file, 'r') as f:
@@ -58,7 +60,6 @@ for ml in MAILING_LISTS:
                             current_file['Attachment'] = i.a.text
 
                     all_files.append(current_file)
-
 
 with open(OUTPUT_FILE, 'w') as csvfile:
     fieldnames = [
