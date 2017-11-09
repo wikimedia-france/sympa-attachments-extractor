@@ -46,7 +46,9 @@ for ml in MAILING_LISTS:
                     try:
                         webpage = f.read()
                     except UnicodeDecodeError:
-                        print("UnicodeDecodeError when parsing email {}".format(email_file))
+                        print(
+                            "UnicodeDecodeError when parsing email {}".format(
+                                email_file))
                         continue
                     soup = BeautifulSoup(webpage, 'html.parser')
 
@@ -62,7 +64,8 @@ for ml in MAILING_LISTS:
                                 current_mail[fieldname] = i.text[start:]
 
                     # Format date
-                    # Some dates miss the initial "Day,", so just assuming it's Monday
+                    # Some dates miss the initial "Day,",
+                    # so just assuming it's Monday.
                     if current_mail["Date"][0].isdigit():
                         current_mail["Date"] = "Mon, " + current_mail["Date"]
                     date = datetime.strptime(
@@ -78,6 +81,7 @@ for ml in MAILING_LISTS:
                             if current_file not in all_files:
                                 all_files.append(current_file)
 
+sorted_files = sorted(all_files, key=lambda k: k['Date'])
 
 with open(OUTPUT_FILE, 'w') as csvfile:
     fieldnames = [
@@ -91,5 +95,5 @@ with open(OUTPUT_FILE, 'w') as csvfile:
 
     writer.writeheader()
 
-    for f in all_files:
+    for f in sorted_files:
         writer.writerow(f)
