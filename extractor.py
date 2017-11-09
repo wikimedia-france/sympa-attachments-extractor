@@ -55,8 +55,8 @@ for ml in MAILING_LISTS:
                     current_mail = {}
                     current_mail['URL'] = "{}{}/{}/{}".format(
                         BASE_URL,
-                        m,
                         ml,
+                        m,
                         mail_file)
 
                     for i in soup.find_all('li'):
