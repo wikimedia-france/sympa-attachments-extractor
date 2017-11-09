@@ -26,8 +26,10 @@ for ml in MAILING_LISTS:
     ml_dir = BASE_DIR + '/' + ml + '@' + SERVER_NAME
 
     months = os.listdir(ml_dir)
+    months.sort()
 
     for m in months:
+        print(m)
         monthly_dir = ml_dir + '/' + m
         for entry in os.listdir(monthly_dir):
 
@@ -41,7 +43,11 @@ for ml in MAILING_LISTS:
                 email_file = monthly_dir + '/' + mail_file
 
                 with open(email_file, 'r', encoding='utf-8') as f:
-                    webpage = f.read()
+                    try:
+                        webpage = f.read()
+                    except UnicodeDecodeError:
+                        print("UnicodeDecodeError when parsing email {}".format(email_file))
+                        continue
                     soup = BeautifulSoup(webpage, 'html.parser')
 
                     current_mail = {}
@@ -56,9 +62,12 @@ for ml in MAILING_LISTS:
                                 current_mail[fieldname] = i.text[start:]
 
                     # Format date
+                    # Some dates miss the initial "Day,", so just assuming it's Monday
+                    if current_mail["Date"][0].isdigit():
+                        current_mail["Date"] = "Mon, " + current_mail["Date"]
                     date = datetime.strptime(
-                        current_mail["Date"],
-                        "%a, %d %b %Y %H:%M:%S %z")
+                        ' '.join(current_mail["Date"].split()[0:5]),
+                        "%a, %d %b %Y %H:%M:%S")
                     current_mail["Date"] = date.strftime("%Y-%m-%d %H:%M:%S")
 
                     for i in soup.find_all('p'):
