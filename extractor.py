@@ -53,7 +53,11 @@ for ml in MAILING_LISTS:
                     soup = BeautifulSoup(webpage, 'html.parser')
 
                     current_mail = {}
-                    current_mail['URL'] = BASE_URL + m + '/' + mail_file
+                    current_mail['URL'] = "{}{}/{}/{}".format(
+                        BASE_URL,
+                        m,
+                        ml,
+                        mail_file)
 
                     for i in soup.find_all('li'):
                         if hasattr(i, 'strong') and hasattr(i.strong, 'text'):
